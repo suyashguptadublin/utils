@@ -1,0 +1,16 @@
+Function 	Table Name	Column Name	Contraint	Values	Expected Checksum	Checksum Type
+Create Table	TEST0001	"ID: INT,
+NAME: VARCHAR,
+PHONE: VARCHAR,
+EMAIL: VARCHAR"	ID: PK			
+Check Table	TEST0001					Structure
+Insert Table	TEST0001	"ID,
+NAME,
+PHONE"		"[[1, RED, 353XXXX, red@test.com],
+[2, GREEN, 353XXXY,green@text.com ]]"		
+Check Table	TEST0001					Data
+Post Operation Test	TEST0001	"ID,
+NAME,
+PHONE"				Data
+DELETE	TEST0001					
+DROP	TEST0001					
