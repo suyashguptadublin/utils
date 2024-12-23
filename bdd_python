@@ -1,0 +1,131 @@
+import teradatasql
+from behave import given, when, then
+
+# Global connection variable
+connection = None
+
+@given("I connect to the Teradata database")
+def step_connect_to_database(context):
+    """
+    Establish a connection to the Teradata database if not already connected.
+    """
+    global connection
+    if connection is None:
+        db_config = context.config["database"]
+        connection = teradatasql.connect(
+            host=db_config["host"],
+            user=db_config["user"],
+            password=db_config["password"],
+            logmech=db_config["logmech"]
+        )
+        print("Database connection established.")
+    context.cursor = connection.cursor()
+
+@when('I run the query for "{test_case}"')
+def step_run_query(context, test_case):
+    """
+    Find and execute the query associated with the test case.
+    """
+    # Find the test case in the config
+    test_cases = context.config["test_cases"]
+    matching_case = next((case for case in test_cases if case["name"] == test_case), None)
+    if not matching_case:
+        raise ValueError(f"Test case '{test_case}' not found in configuration.")
+
+    # Run the query
+    query = matching_case["query"]
+    print(f"Executing query: {query}")
+    context.cursor.execute(query)
+    context.results = context.cursor.fetchall()
+
+    # Store validation details
+    context.validation = matching_case["validation"]
+
+@then("I should validate the results")
+def step_validate_results(context):
+    """
+    Validate the query results based on the test case's validation type.
+    """
+    validation_type = context.validation["type"]
+    expected = context.validation["expected"]
+    results = context.results
+
+    if validation_type == "row_count":
+        # Validate row count
+        actual_rows = len(results)
+        assert actual_rows >= expected, f"Expected at least {expected} rows, but got {actual_rows}."
+
+    elif validation_type == "aggregate_value":
+        # Validate aggregate value (e.g., SUM)
+        actual_value = results[0][0]  # Assuming the query returns a single aggregate value
+        assert actual_value == expected, f"Expected {expected}, but got {actual_value}."
+
+    elif validation_type == "specific_values":
+        # Validate specific rows and columns
+        for expected_row, actual_row in zip(expected, results):
+            for key, value in expected_row.items():
+                actual_index = list(expected_row.keys()).index(key)
+                assert value == actual_row[actual_index], f"Expected {key} = {value}, but got {actual_row[actual_index]}."
+
+    else:
+        raise ValueError(f"Unsupported validation type: {validation_type}")
+
+
+
+
+////
+{
+  "database": {
+    "host": "your_teradata_host",
+    "user": "your_ldap_username",
+    "password": "your_ldap_password",
+    "logmech": "LDAP"
+  },
+  "test_cases": [
+    {
+      "name": "Fetch all rows from table1",
+      "query": "SELECT * FROM DDEWD06S.table1",
+      "validation": {
+        "type": "row_count",
+        "expected": 5
+      }
+    },
+    {
+      "name": "Verify total amount in table2",
+      "query": "SELECT SUM(amount) FROM DDEWD06S.table2",
+      "validation": {
+        "type": "aggregate_value",
+        "expected": 1000
+      }
+    },
+    {
+      "name": "Check specific column values in sample_table",
+      "query": "SELECT id, name FROM DDEWD06S.sample_table WHERE id > 1",
+      "validation": {
+        "type": "specific_values",
+        "expected": [
+          {"id": 2, "name": "Alice"},
+          {"id": 3, "name": "Bob"}
+        ]
+      }
+    }
+  ]
+}
+
+
+
+
+Feature: SQL Query Testing
+  Test multiple SQL queries on different tables with their respective expected results.
+
+  Scenario Outline: Execute a query and validate the result
+    Given I connect to the Teradata database
+    When I run the query for "<test_case>"
+    Then I should see at least "<expected_rows>" rows returned
+
+    Examples:
+      | test_case                           | expected_rows |
+      | Fetch all rows from table1          | 5             |
+      | Count rows in table2                | 10            |
+      | Fetch specific columns from sample_table | 2         |
+      | Check for distinct values in table3 | 3             |
