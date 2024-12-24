@@ -151,3 +151,33 @@ def generate_insert_sql(row):
         sql_statements.append(sql)
 
     return sql_statements, table_name
+def generate_batch_insert_sql(row):
+    """
+    Generate a single SQL statement for inserting multiple rows into a table.
+    Args:
+        row (dict): Row containing table details (Table Name, Column Name, Values).
+    Returns:
+        str: A single SQL INSERT statement for all rows.
+    """
+    table_name = row['Table Name']
+    column_def = row['Column Name']
+    values = row['Values']
+
+    # Parse column names
+    columns = column_def.split(",\n")  # Split by newlines
+    columns = [col.strip() for col in columns]  # Remove extra spaces
+
+    # Parse values (assuming JSON-like format)
+    values_list = eval(values)  # Safely evaluate string into a Python list
+
+    # Generate SQL VALUES clause
+    formatted_values = []
+    for row_values in values_list:
+        formatted_row = ", ".join(
+            [f"'{value}'" if isinstance(value, str) else str(value) for value in row_values]
+        )
+        formatted_values.append(f"({formatted_row})")
+
+    # Combine into a single INSERT statement
+    sql = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES {', '.join(formatted_values)};"
+    return sql, table_name
