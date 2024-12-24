@@ -1,16 +1,14 @@
-S C:\Products\projects\python> & c:/Products/projects/python/venv/Scripts/python.exe c:/Products/projects/python/database_operations/runner.py
-Create Table TEST0001 ID:INTEGER,
-NAME:VARCHAR,
-PHONE:VARCHAR,
-EMAIL:VARCHAR nan nan nan
-CREATE TABLE TEST0001 (
-    ID INTEGER PRIMARY KEY,
-    NAME VARCHAR,
-    PHONE VARCHAR,
-    EMAIL VARCHAR
-);
+Cursor closed.
+Connection closed.
+PS C:\Products\projects\python> ^C
+PS C:\Products\projects\python> & c:/Products/projects/python/venv/Scripts/python.exe c:/Products/projects/python/database_operations/runner.py
 Database connection established.
-Error during database operation: [Version 20.0.0.21] [Session 2414113] [Teradata Database] [Error 3707] Syntax error, expected something like '(' between the 'VARCHAR' keyword and ','.
+Cursor closed.
+Connection closed.
+Schema Matched
+INSERT INTO TEST0001 (ID, NAME, PHONE, EMAIL) VALUES (1, 'RED', '353XXXX', 'red@test.com'), (2, 'GREEN', '353XXXY', 'green@text.com'); TEST0001
+Database connection established.
+Error during database operation: [Version 20.0.0.21] [Session 2416574] [Teradata Database] [Error 3803] Table 'TEST0001' already exists.
  at gosqldriver/teradatasql.formatError ErrorUtil.go:92
  at gosqldriver/teradatasql.(*teradataConnection).formatDatabaseError ErrorUtil.go:252
  at gosqldriver/teradatasql.(*teradataConnection).makeChainedDatabaseError ErrorUtil.go:268
@@ -33,7 +31,7 @@ Error during database operation: [Version 20.0.0.21] [Session 2414113] [Teradata
  at runtime.cgocallback asm_amd64.s:1079
  at runtime.goexit asm_amd64.s:1695
 Traceback (most recent call last):
-  File "c:\Products\projects\python\database_operations\database_context.py", line 27, in teradata_connection
+  File "c:\Products\projects\python\database_operations\database_context.py", line 28, in teradata_connection
     yield cursor  # Provide the cursor for executing queries
     ^^^^^^^^^^^^
   File "c:\Products\projects\python\database_operations\runner.py", line 19, in execute_sql_query
@@ -44,7 +42,7 @@ Traceback (most recent call last):
     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Products\projects\python\venv\Lib\site-packages\teradatasql\__init__.py", line 1007, in executemany
     raise OperationalError (sErr)
-teradatasql.OperationalError: [Version 20.0.0.21] [Session 2414113] [Teradata Database] [Error 3707] Syntax error, expected something like '(' between the 'VARCHAR' keyword and ','.
+teradatasql.OperationalError: [Version 20.0.0.21] [Session 2416574] [Teradata Database] [Error 3803] Table 'TEST0001' already exists.
  at gosqldriver/teradatasql.formatError ErrorUtil.go:92
  at gosqldriver/teradatasql.(*teradataConnection).formatDatabaseError ErrorUtil.go:252
  at gosqldriver/teradatasql.(*teradataConnection).makeChainedDatabaseError ErrorUtil.go:268
@@ -69,34 +67,4 @@ teradatasql.OperationalError: [Version 20.0.0.21] [Session 2414113] [Teradata Da
 
 Cursor closed.
 Connection closed.
-Check Table TEST0001 nan nan nan Structure
-Insert Table TEST0001 ID,
-NAME,
-PHONE [[1, RED, 353XXXX, red@test.com],
-[2, GREEN, 353XXXY,green@text.com ]] nan nan
-Check Table TEST0001 nan nan nan Data
-Post Operation Test TEST0001 ID,
-NAME,
-PHONE nan nan Data
-DELETE TEST0001 nan nan nan nan
-DROP TEST0001 nan nan nan nan
 PS C:\Products\projects\python> 
-
-Function	Table Name	Column Name	Constraint	Values
-Create Table	TEST0001	"ID:INTEGER,
-NAME:VARCHAR,
-PHONE:VARCHAR,
-EMAIL:VARCHAR"	ID: PK	
-Check Table	TEST0001			
-Insert Table	TEST0001	"ID,
-NAME,
-PHONE"		"[[1, RED, 353XXXX, red@test.com],
-[2, GREEN, 353XXXY,green@text.com ]]"
-Check Table	TEST0001			
-Post Operation Test	TEST0001	"ID,
-NAME,
-PHONE"		
-DELETE	TEST0001			
-DROP	TEST0001			
-				
-				
