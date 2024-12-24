@@ -48,3 +48,8 @@ SELECT ColumnName, ColumnType, ColumnLength, DecimalTotalDigits, DecimalFraction
                 FROM DBC.ColumnsV
                 WHERE DatabaseName = '{database}' AND TableName = '{table}'
                 ORDER BY ColumnID
+    # Create a string representation of the table structure
+    structure_string = "\n".join([f"{col[0]}:{col[1]}({col[2]},{col[3]},{col[4]})" for col in columns])
+    
+    # Generate hash
+    return hashlib.sha256(structure_string.encode()).hexdigest()
