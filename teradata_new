@@ -1,0 +1,58 @@
+def process_validation(config, validation_df):
+    """Process validation tasks using Teradata."""
+    with teradata_connection(config) as cursor:
+        for _, row in validation_df.iterrows():
+            function = row['Function']
+            table_name = row['Table Name']
+            column_def = row['Column Name']
+            values = row['Values']
+            expected_checksum = row['Expected Checksum']
+            checksum_type = row['Checksum Type']
+
+            try:
+                if function == "Create Table":
+                    # Create Table logic
+                    sql = f"CREATE TABLE {table_name} ({column_def.replace('\n', ', ')})"
+                    cursor.execute(sql)
+                    print(f"Table {table_name} created successfully.")
+
+                elif function == "Insert Table":
+                    # Insert Data logic
+                    columns = column_def.replace("\n", "").split(", ")
+                    data = json.loads(values.replace("'", '"'))
+                    for row_values in data:
+                        placeholders = ", ".join(["?"] * len(row_values))
+                        sql = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({placeholders})"
+                        cursor.execute(sql, row_values)
+                    print(f"Data inserted into {table_name} successfully.")
+
+                elif function == "Check Table":
+                    # Check Table logic
+                    if checksum_type == "Structure":
+                        current_checksum = compute_schema_checksum(cursor, table_name)
+                    elif checksum_type == "Data":
+                        current_checksum = compute_data_checksum(cursor, table_name)
+                    else:
+                        raise ValueError("Unknown checksum type.")
+
+                    if current_checksum == expected_checksum:
+                        print(f"{checksum_type} checksum for {table_name} matches.")
+                    else:
+                        print(f"{checksum_type} checksum for {table_name} does NOT match!")
+                        print(f"Expected: {expected_checksum}, Got: {current_checksum}")
+
+                elif function == "DELETE":
+                    # Delete Data logic
+                    sql = f"DELETE FROM {table_name}"
+                    cursor.execute(sql)
+                    print(f"Data deleted from {table_name}.")
+
+                elif function == "DROP":
+                    # Drop Table logic
+                    sql = f"DROP TABLE {table_name}"
+                    cursor.execute(sql)
+                    print(f"Table {table_name} dropped.")
+
+            except Exception as e:
+                print(f"Error processing {function} for table {table_name}: {e}")
+
