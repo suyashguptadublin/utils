@@ -44,3 +44,7 @@ def compute_table_structure_checksum(cursor, table_name):
     ON ColumnsV.TableName = IndicesV.TableName
     WHERE ColumnsV.TableName = 'TEST0001'
     ORDER BY ColumnId;
+SELECT ColumnName, ColumnType, ColumnLength, DecimalTotalDigits, DecimalFractionalDigits
+                FROM DBC.ColumnsV
+                WHERE DatabaseName = '{database}' AND TableName = '{table}'
+                ORDER BY ColumnID
