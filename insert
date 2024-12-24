@@ -1,0 +1,29 @@
+def generate_individual_insert_sql(row):
+    """
+    Generate multiple SQL statements for inserting data into a table.
+    Args:
+        row (dict): Row containing table details (Table Name, Column Name, Values).
+    Returns:
+        list: A list of SQL INSERT statements, one per row.
+    """
+    table_name = row['Table Name']
+    column_def = row['Column Name']
+    values = row['Values']
+
+    # Parse column names
+    columns = column_def.split(",\n")  # Split by newlines
+    columns = [col.strip() for col in columns]  # Remove extra spaces
+
+    # Parse values (assuming JSON-like format)
+    values_list = eval(values)  # Safely evaluate string into a Python list
+
+    # Generate individual SQL INSERT statements
+    sql_statements = []
+    for row_values in values_list:
+        formatted_values = ", ".join(
+            [f"'{value}'" if isinstance(value, str) else str(value) for value in row_values]
+        )
+        sql = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({formatted_values});"
+        sql_statements.append(sql)
+
+    return sql_statements
