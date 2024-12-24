@@ -101,3 +101,23 @@ process_validation(connection, validation_df)
 
 # Close connection
 connection.close()
+def generate_create_table_sql(row):
+    """Generate SQL for creating a table based on the row."""
+    table_name = row['Table Name']
+    column_def = row['Column Name']
+    constraint = row['Constraint']
+
+    # Parse columns
+    columns = column_def.split(",\n")  # Split by newlines
+    columns = [col.strip().replace(":", " ") for col in columns]  # Convert "ID: INT" -> "ID INT"
+
+    # Handle constraints
+    if constraint and "PK" in constraint:
+        constraint_col = constraint.split(":")[0].strip()
+        for i, col in enumerate(columns):
+            if col.startswith(constraint_col):
+                columns[i] += " PRIMARY KEY NOT NULL"
+
+    # Generate SQL
+    sql = f"CREATE TABLE {table_name} (\n    {',\n    '.join(columns)}\n);"
+    return sql, table_name
