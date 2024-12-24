@@ -1,3 +1,53 @@
+def generate_insert_sql(row):
+    """
+    Generate a list of SQL INSERT statements for inserting data into a table.
+    """
+    table_name = row['Table Name']
+    column_def = row['Column Name']
+    values = row['Values']
+
+    # Parse column names
+    columns = column_def.split(",\n")  # Split by newlines
+    columns = [col.strip() for col in columns]  # Remove extra spaces
+
+    # Parse values (assuming JSON-like format)
+    values_list = eval(values)  # Safely evaluate string into a Python list
+
+    # Generate individual SQL INSERT statements
+    sql_statements = []
+    for row_values in values_list:
+        formatted_values = ", ".join(
+            [f"'{value}'" if isinstance(value, str) else str(value) for value in row_values]
+        )
+        sql = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({formatted_values});"
+        sql_statements.append(sql)
+
+    return sql_statements, table_name
+def execute_sql_query(sql, operation_type=None, type=None):
+    with teradata_connection(host, user, password, DB_NAME) as cursor:
+        try:
+            if operation_type == "insert":
+                if isinstance(sql, list):
+                    # Execute each SQL statement individually
+                    for query in sql:
+                        cursor.execute(query)
+                        print(f"Executed: {query}")
+                else:
+                    raise ValueError("INSERT operation requires a list of SQL statements.")
+            else:
+                cursor.execute(sql)
+                if type:
+                    columns = cursor.fetchall()
+                    structure_string = "\n".join([f"{col[0]}:{col[1]}({col[2]},{col[3]},{col[4]})" for col in columns])
+                    return hashlib.sha256(structure_string.encode()).hexdigest()
+
+        except Exception as ex:
+            print(traceback.format_exc())
+            print(ex)
+
+
+
+
 import pandas as pd
 import hashlib
 import json
