@@ -1,0 +1,36 @@
+import hashlib
+
+def compute_table_structure_checksum(cursor, table_name):
+    """
+    Compute a checksum for the table structure by querying metadata.
+    Args:
+        cursor: Database cursor for executing queries.
+        table_name: Name of the table to analyze.
+    Returns:
+        str: SHA-256 checksum of the table structure.
+    """
+    # Query to get table structure from Teradata's metadata
+    sql = f"""
+    SELECT 
+        ColumnName, 
+        ColumnType, 
+        COALESCE(CharType || '(' || ColumnLength || ')', '') AS ColumnDefinition, 
+        CASE WHEN IndexType = 'P' THEN 'PRIMARY KEY' ELSE '' END AS ConstraintType
+    FROM DBC.ColumnsV
+    LEFT JOIN DBC.IndicesV
+    ON ColumnsV.TableName = IndicesV.TableName
+    WHERE ColumnsV.TableName = '{table_name}'
+    ORDER BY ColumnId;
+    """
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+
+    # Normalize structure
+    structure = "|".join([
+        f"{row[0]}:{row[1]}:{row[2]}:{row[3]}" for row in rows
+    ])
+
+    # Compute checksum
+    checksum = hashlib.sha256(structure.encode('utf-8')).hexdigest()
+    return checksum
+
