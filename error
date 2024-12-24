@@ -1,36 +1,102 @@
-PS C:\Products\projects\python> & c:/Products/projects/python/venv/Scripts/python.exe c:/Products/projects/python/database_operations/runner.py
-test 0 Function                                                  Create Table
-Table Name                                                    TEST0001
-Column Name          ID: INT,\nNAME: VARCHAR,\nPHONE: VARCHAR,\nEMA...
-Contraint                                                       ID: PK
-Values                                                             NaN
-Expected Checksum                                                  NaN
-Checksum Type                                                      NaN
-Name: 0, dtype: object
-'Function' Traceback (most recent call last):
-  File "C:\Products\projects\python\venv\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
-    return self._engine.get_loc(casted_key)
-           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
-  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
-  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
-  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
-  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
-KeyError: 'Function'
-
-The above exception was the direct cause of the following exception:
-
+S C:\Products\projects\python> & c:/Products/projects/python/venv/Scripts/python.exe c:/Products/projects/python/database_operations/runner.py
+Create Table TEST0001 ID:INTEGER,
+NAME:VARCHAR,
+PHONE:VARCHAR,
+EMAIL:VARCHAR nan nan nan
+CREATE TABLE TEST0001 (
+    ID INTEGER PRIMARY KEY,
+    NAME VARCHAR,
+    PHONE VARCHAR,
+    EMAIL VARCHAR
+);
+Database connection established.
+Error during database operation: [Version 20.0.0.21] [Session 2414113] [Teradata Database] [Error 3707] Syntax error, expected something like '(' between the 'VARCHAR' keyword and ','.
+ at gosqldriver/teradatasql.formatError ErrorUtil.go:92
+ at gosqldriver/teradatasql.(*teradataConnection).formatDatabaseError ErrorUtil.go:252
+ at gosqldriver/teradatasql.(*teradataConnection).makeChainedDatabaseError ErrorUtil.go:268
+ at gosqldriver/teradatasql.(*teradataConnection).processErrorParcel TeradataConnection.go:751
+ at gosqldriver/teradatasql.(*TeradataRows).processResponseBundle TeradataRows.go:2308
+ at gosqldriver/teradatasql.(*TeradataRows).executeSQLRequest TeradataRows.go:874
+ at gosqldriver/teradatasql.newTeradataRows TeradataRows.go:720
+ at gosqldriver/teradatasql.(*teradataStatement).QueryContext TeradataStatement.go:122
+ at gosqldriver/teradatasql.(*teradataConnection).QueryContext TeradataConnection.go:1261
+ at database/sql.ctxDriverQuery ctxutil.go:48
+ at database/sql.(*DB).queryDC.func1 sql.go:1776
+ at database/sql.withLock sql.go:3530
+ at database/sql.(*DB).queryDC sql.go:1771
+ at database/sql.(*Conn).QueryContext sql.go:2027
+ at main.createRows goside.go:1080
+ at main.goCreateRows goside.go:959
+ at _cgoexp_e3ee842aae7c_goCreateRows _cgo_gotypes.go:414
+ at runtime.cgocallbackg1 cgocall.go:403
+ at runtime.cgocallbackg cgocall.go:322
+ at runtime.cgocallback asm_amd64.s:1079
+ at runtime.goexit asm_amd64.s:1695
 Traceback (most recent call last):
-  File "c:\Products\projects\python\database_operations\runner.py", line 104, in <module>
-    process_validation(host, user,password, validation_df)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "c:\Products\projects\python\database_operations\runner.py", line 17, in process_validation
-    function = row['Function']
-               ~~~^^^^^^^^^^^^
-  File "C:\Products\projects\python\venv\Lib\site-packages\pandas\core\series.py", line 1121, in __getitem__
-    return self._get_value(key)
-           ~~~~~~~~~~~~~~~^^^^^
-  File "C:\Products\projects\python\venv\Lib\site-packages\pandas\core\series.py", line 1237, in _get_value
-    loc = self.index.get_loc(label)
-  File "C:\Products\projects\python\venv\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
-    raise KeyError(key) from err
-KeyError: 'Function'
+  File "c:\Products\projects\python\database_operations\database_context.py", line 27, in teradata_connection
+    yield cursor  # Provide the cursor for executing queries
+    ^^^^^^^^^^^^
+  File "c:\Products\projects\python\database_operations\runner.py", line 19, in execute_sql_query
+    cursor.execute(sql)
+    ~~~~~~~~~~~~~~^^^^^
+  File "C:\Products\projects\python\venv\Lib\site-packages\teradatasql\__init__.py", line 752, in execute
+    self.executemany (sOperation, None, ignoreErrors)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Products\projects\python\venv\Lib\site-packages\teradatasql\__init__.py", line 1007, in executemany
+    raise OperationalError (sErr)
+teradatasql.OperationalError: [Version 20.0.0.21] [Session 2414113] [Teradata Database] [Error 3707] Syntax error, expected something like '(' between the 'VARCHAR' keyword and ','.
+ at gosqldriver/teradatasql.formatError ErrorUtil.go:92
+ at gosqldriver/teradatasql.(*teradataConnection).formatDatabaseError ErrorUtil.go:252
+ at gosqldriver/teradatasql.(*teradataConnection).makeChainedDatabaseError ErrorUtil.go:268
+ at gosqldriver/teradatasql.(*teradataConnection).processErrorParcel TeradataConnection.go:751
+ at gosqldriver/teradatasql.(*TeradataRows).processResponseBundle TeradataRows.go:2308
+ at gosqldriver/teradatasql.(*TeradataRows).executeSQLRequest TeradataRows.go:874
+ at gosqldriver/teradatasql.newTeradataRows TeradataRows.go:720
+ at gosqldriver/teradatasql.(*teradataStatement).QueryContext TeradataStatement.go:122
+ at gosqldriver/teradatasql.(*teradataConnection).QueryContext TeradataConnection.go:1261
+ at database/sql.ctxDriverQuery ctxutil.go:48
+ at database/sql.(*DB).queryDC.func1 sql.go:1776
+ at database/sql.withLock sql.go:3530
+ at database/sql.(*DB).queryDC sql.go:1771
+ at database/sql.(*Conn).QueryContext sql.go:2027
+ at main.createRows goside.go:1080
+ at main.goCreateRows goside.go:959
+ at _cgoexp_e3ee842aae7c_goCreateRows _cgo_gotypes.go:414
+ at runtime.cgocallbackg1 cgocall.go:403
+ at runtime.cgocallbackg cgocall.go:322
+ at runtime.cgocallback asm_amd64.s:1079
+ at runtime.goexit asm_amd64.s:1695
+
+Cursor closed.
+Connection closed.
+Check Table TEST0001 nan nan nan Structure
+Insert Table TEST0001 ID,
+NAME,
+PHONE [[1, RED, 353XXXX, red@test.com],
+[2, GREEN, 353XXXY,green@text.com ]] nan nan
+Check Table TEST0001 nan nan nan Data
+Post Operation Test TEST0001 ID,
+NAME,
+PHONE nan nan Data
+DELETE TEST0001 nan nan nan nan
+DROP TEST0001 nan nan nan nan
+PS C:\Products\projects\python> 
+
+Function	Table Name	Column Name	Constraint	Values
+Create Table	TEST0001	"ID:INTEGER,
+NAME:VARCHAR,
+PHONE:VARCHAR,
+EMAIL:VARCHAR"	ID: PK	
+Check Table	TEST0001			
+Insert Table	TEST0001	"ID,
+NAME,
+PHONE"		"[[1, RED, 353XXXX, red@test.com],
+[2, GREEN, 353XXXY,green@text.com ]]"
+Check Table	TEST0001			
+Post Operation Test	TEST0001	"ID,
+NAME,
+PHONE"		
+DELETE	TEST0001			
+DROP	TEST0001			
+				
+				
