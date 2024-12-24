@@ -34,3 +34,13 @@ def compute_table_structure_checksum(cursor, table_name):
     checksum = hashlib.sha256(structure.encode('utf-8')).hexdigest()
     return checksum
 
+  SELECT
+        ColumnName,
+        ColumnType,
+        COALESCE(CharType || '(' || ColumnLength || ')', '') AS ColumnDefinition,
+        CASE WHEN IndexType = 'P' THEN 'PRIMARY KEY' ELSE '' END AS ConstraintType
+    FROM DBC.ColumnsV
+    LEFT JOIN DBC.IndicesV
+    ON ColumnsV.TableName = IndicesV.TableName
+    WHERE ColumnsV.TableName = 'TEST0001'
+    ORDER BY ColumnId;
