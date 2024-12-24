@@ -1,14 +1,9 @@
 Cursor closed.
 Connection closed.
-PS C:\Products\projects\python> ^C
-PS C:\Products\projects\python> & c:/Products/projects/python/venv/Scripts/python.exe c:/Products/projects/python/database_operations/runner.py
-Database connection established.
-Cursor closed.
-Connection closed.
 Schema Matched
 INSERT INTO TEST0001 (ID, NAME, PHONE, EMAIL) VALUES (1, 'RED', '353XXXX', 'red@test.com'), (2, 'GREEN', '353XXXY', 'green@text.com'); TEST0001
 Database connection established.
-Error during database operation: [Version 20.0.0.21] [Session 2416574] [Teradata Database] [Error 3803] Table 'TEST0001' already exists.
+Error during database operation: [Version 20.0.0.21] [Session 2416625] [Teradata Database] [Error 3706] Syntax error: expected something between ')' and ','.
  at gosqldriver/teradatasql.formatError ErrorUtil.go:92
  at gosqldriver/teradatasql.(*teradataConnection).formatDatabaseError ErrorUtil.go:252
  at gosqldriver/teradatasql.(*teradataConnection).makeChainedDatabaseError ErrorUtil.go:268
@@ -42,7 +37,7 @@ Traceback (most recent call last):
     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\Products\projects\python\venv\Lib\site-packages\teradatasql\__init__.py", line 1007, in executemany
     raise OperationalError (sErr)
-teradatasql.OperationalError: [Version 20.0.0.21] [Session 2416574] [Teradata Database] [Error 3803] Table 'TEST0001' already exists.
+teradatasql.OperationalError: [Version 20.0.0.21] [Session 2416625] [Teradata Database] [Error 3706] Syntax error: expected something between ')' and ','.
  at gosqldriver/teradatasql.formatError ErrorUtil.go:92
  at gosqldriver/teradatasql.(*teradataConnection).formatDatabaseError ErrorUtil.go:252
  at gosqldriver/teradatasql.(*teradataConnection).makeChainedDatabaseError ErrorUtil.go:268
