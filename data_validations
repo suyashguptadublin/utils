@@ -1,0 +1,52 @@
+import hashlib
+import teradatasql
+
+def compute_record_signature(records, selection_order):
+    """
+    Compute a signature (hash) for records based on the selection order.
+    Args:
+        records (list): List of tuples representing rows fetched from the table.
+        selection_order (list): List of column names in the selection order.
+    Returns:
+        str: SHA-256 hash representing the records' signature.
+    """
+    # Normalize and sort records based on selection order
+    normalized_data = []
+    for record in records:
+        # Concatenate fields in the specified selection order
+        row_string = "|".join(str(record[selection_order.index(col)]) for col in selection_order)
+        normalized_data.append(row_string)
+
+    # Join all rows into a single string
+    data_string = "\n".join(normalized_data)
+
+    # Compute and return the hash
+    return hashlib.sha256(data_string.encode('utf-8')).hexdigest()
+
+def validate_table_signature(cursor, table_name, expected_signature, selection_order):
+    """
+    Validate the signature of a table's records based on a selection order.
+    Args:
+        cursor: Database cursor.
+        table_name (str): Name of the table to query.
+        expected_signature (str): Precomputed hash for validation.
+        selection_order (list): List of column names in the selection order.
+    Returns:
+        bool: True if the computed signature matches the expected signature.
+    """
+    # Fetch data in the specified selection order
+    sql = f"SELECT {', '.join(selection_order)} FROM {table_name} ORDER BY {selection_order[0]}"
+    cursor.execute(sql)
+    records = cursor.fetchall()
+
+    # Compute the signature for the fetched records
+    computed_signature = compute_record_signature(records, selection_order)
+
+    # Compare the computed signature with the expected signature
+    if computed_signature == expected_signature:
+        print(f"Signature matches for table {table_name}.")
+        return True
+    else:
+        print(f"Signature mismatch for table {table_name}!")
+        print(f"Expected: {expected_signature}, Computed: {computed_signature}")
+        return False
