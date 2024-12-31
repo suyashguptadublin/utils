@@ -1,0 +1,70 @@
+from openpyxl import load_workbook
+import hashlib
+
+def precompute_signatures_from_excel(file_path, sheet_name):
+    """
+    Compute and save hash signatures based on values in an Excel sheet.
+    Args:
+        file_path (str): Path to the Excel file.
+        sheet_name (str): Name of the sheet to update.
+    """
+    # Load the workbook and sheet
+    workbook = load_workbook(file_path)
+    sheet = workbook[sheet_name]
+
+    # Identify column indexes
+    headers = [cell.value for cell in sheet[1]]  # First row as headers
+    function_col = headers.index("Function") + 1
+    table_name_col = headers.index("Table Name") + 1
+    values_col = headers.index("Values") + 1
+    computed_signature_col = headers.index("Computed Signature") + 1
+
+    # Iterate through rows
+    for row in range(2, sheet.max_row + 1):  # Skip header row
+        function = sheet.cell(row=row, column=function_col).value
+
+        # Process rows with function 'Check Table Records'
+        if function == "Check Table Records":
+            values = sheet.cell(row=row, column=values_col).value
+
+            if values:
+                # Parse values and compute the hash
+                computed_signature = compute_signature_from_values(values)
+
+                # Save the computed signature
+                sheet.cell(row=row, column=computed_signature_col, value=computed_signature)
+            else:
+                print(f"Row {row}: 'Values' is empty, skipping.")
+
+    # Save the updated workbook
+    workbook.save(file_path)
+    print(f"Updated Excel file saved at {file_path}")
+
+
+def compute_signature_from_values(values):
+    """
+    Compute a hash signature for values provided in the Excel sheet.
+    Args:
+        values (str): String of values in a structured format (e.g., JSON-like or list of lists).
+                      Example: "[[1, 'RED', '353XXXX'], [2, 'GREEN', '353XXXY']]"
+    Returns:
+        str: SHA-256 hash representing the values' signature.
+    """
+    # Parse the values (assumes they are JSON-like; use eval for simplicity here)
+    try:
+        parsed_values = eval(values)  # Converts string representation to Python list
+    except Exception as e:
+        print(f"Error parsing values: {values}. Exception: {e}")
+        return None
+
+    # Normalize the data (e.g., convert to strings and join rows)
+    normalized_data = []
+    for row in parsed_values:
+        row_string = "|".join(map(str, row))  # Convert each value to a string and join with "|"
+        normalized_data.append(row_string)
+
+    # Join all rows into a single string
+    data_string = "\n".join(normalized_data)
+
+    # Compute and return the hash
+    return hashlib.sha256(data_string.encode('utf-8')).hexdigest()
