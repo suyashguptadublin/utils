@@ -1,6 +1,27 @@
 import hashlib
 import pandas as pd
 
+def compute_table_structure_hash(column_def):
+    """
+    Compute a checksum for table properties.
+    Args:
+        column_def (str): Column definitions as a string (e.g., "ID:INTEGER,\nNAME:VARCHAR").
+    Returns:
+        str: SHA-256 checksum of the sorted and normalized column definitions.
+    """
+    # Parse and normalize column definitions
+    columns = column_def.split(",\n")  # Split by newlines
+    parsed_columns = [col.strip() for col in columns]  # Remove extra spaces
+
+    # Sort columns alphabetically by column name
+    sorted_columns = sorted(parsed_columns, key=lambda x: x.split(":")[0].strip().lower())
+
+    # Concatenate sorted column definitions
+    structure_string = "".join(sorted_columns)
+
+    # Compute and return the checksum
+    return hashlib.sha256(structure_string.encode('utf-8')).hexdigest()
+
 def generate_table_structure_hash_from_excel(row):
     """
     Generate a hash for a table's structure based on column definitions from the Excel row.
