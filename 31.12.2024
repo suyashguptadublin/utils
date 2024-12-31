@@ -29,3 +29,129 @@ def generate_table_structure_hash_from_excel(row):
     # Generate and return SHA-256 hash
     structure_hash = hashlib.sha256(structure_string.encode('utf-8')).hexdigest()
     return structure_hash
+
+
+
+
+from openpyxl import load_workbook
+import hashlib
+
+def calculate_and_save_checksums(file_path, sheet_name):
+    """
+    Calculate and save checksums for rows with the function 'Check Table Schema' in an Excel sheet.
+    Args:
+        file_path (str): Path to the Excel file.
+        sheet_name (str): Name of the sheet to update.
+    """
+    # Load the workbook and sheet
+    workbook = load_workbook(file_path)
+    sheet = workbook[sheet_name]
+
+    # Get the header row to identify column indexes
+    header_row = 1
+    headers = [cell.value for cell in sheet[header_row]]
+
+    # Ensure required columns are present
+    if "Function" not in headers or "Column Name" not in headers or "Computed Checksum" not in headers:
+        raise ValueError("Required columns 'Function', 'Column Name', and 'Computed Checksum' are missing.")
+
+    function_col = headers.index("Function") + 1
+    column_name_col = headers.index("Column Name") + 1
+    checksum_col = headers.index("Computed Checksum") + 1
+
+    # Iterate through rows to calculate and save checksums
+    for row in range(2, sheet.max_row + 1):  # Start from row 2 to skip the header
+        function = sheet.cell(row=row, column=function_col).value
+
+        # Process rows where Function is 'Check Table Schema'
+        if function == "Check Table Schema":
+            column_name = sheet.cell(row=row, column=column_name_col).value
+
+            if column_name:
+                # Compute the checksum for the Column Name properties
+                checksum = compute_checksum_from_column_properties(column_name)
+
+                # Save the computed checksum to the 'Computed Checksum' column
+                sheet.cell(row=row, column=checksum_col, value=checksum)
+            else:
+                print(f"Row {row}: 'Column Name' is empty, skipping.")
+
+    # Save the updated workbook
+    workbook.save(file_path)
+    print(f"Updated Excel file saved at {file_path}")
+
+
+from openpyxl import load_workbook
+import hashlib
+
+def calculate_and_save_checksums(file_path, sheet_name):
+    """
+    Calculate and save checksums for rows with the function 'Check Table Schema' in an Excel sheet.
+    Args:
+        file_path (str): Path to the Excel file.
+        sheet_name (str): Name of the sheet to update.
+    """
+    # Load the workbook and sheet
+    workbook = load_workbook(file_path)
+    sheet = workbook[sheet_name]
+
+    # Get the header row to identify column indexes
+    header_row = 1
+    headers = [cell.value for cell in sheet[header_row]]
+
+    # Ensure required columns are present
+    if "Function" not in headers or "Column Name" not in headers or "Computed Checksum" not in headers:
+        raise ValueError("Required columns 'Function', 'Column Name', and 'Computed Checksum' are missing.")
+
+    function_col = headers.index("Function") + 1
+    column_name_col = headers.index("Column Name") + 1
+    checksum_col = headers.index("Computed Checksum") + 1
+
+    # Iterate through rows to calculate and save checksums
+    for row in range(2, sheet.max_row + 1):  # Start from row 2 to skip the header
+        function = sheet.cell(row=row, column=function_col).value
+
+        # Process rows where Function is 'Check Table Schema'
+        if function == "Check Table Schema":
+            column_name = sheet.cell(row=row, column=column_name_col).value
+
+            if column_name:
+                # Compute the checksum for the Column Name properties
+                checksum = compute_checksum_from_column_properties(column_name)
+
+                # Save the computed checksum to the 'Computed Checksum' column
+                sheet.cell(row=row, column=checksum_col, value=checksum)
+            else:
+                print(f"Row {row}: 'Column Name' is empty, skipping.")
+
+    # Save the updated workbook
+    workbook.save(file_path)
+    print(f"Updated Excel file saved at {file_path}")
+
+########################
+def compute_checksum_from_column_properties(column_properties):
+    """
+    Compute a checksum for table properties defined in the 'Column Name' field.
+    Args:
+        column_properties (str): String defining table properties (e.g., "ID:INTEGER,\nNAME:VARCHAR").
+    Returns:
+        str: SHA-256 checksum of the sorted and normalized column properties.
+    """
+    # Parse and normalize column properties
+    columns = column_properties.split(",\n")  # Split by newlines
+    parsed_columns = [col.strip() for col in columns]  # Remove extra spaces
+
+    # Sort columns alphabetically by column name
+    sorted_columns = sorted(parsed_columns, key=lambda x: x.split(":")[0].strip().lower())
+
+    # Concatenate sorted column definitions
+    structure_string = "".join(sorted_columns)
+
+    # Compute and return the checksum
+    return hashlib.sha256(structure_string.encode('utf-8')).hexdigest()
+
+excel_path = "validations.xlsx"
+sheet_name = "Validations"
+
+# Calculate and save checksums
+calculate_and_save_checksums(excel_path, sheet_name)
