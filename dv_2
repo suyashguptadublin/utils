@@ -2,6 +2,45 @@ from openpyxl import load_workbook
 import hashlib
 
 import hashlib
+
+def generate_create_table_sql(row):
+    """
+    Generate SQL for creating a table based on the row, handling INTEGER type normalization.
+    Args:
+        row (dict): Row containing 'Table Name', 'Column Name', and 'Constraint'.
+    Returns:
+        tuple: Generated SQL string and table name.
+    """
+    table_name = row['Table Name']
+    column_def = row['Column Name']
+    constraint = row['Constraint']
+
+    # Parse and normalize columns
+    columns = column_def.split(",\n")  # Split by newlines
+    normalized_columns = []
+
+    for col in columns:
+        # Split the column definition into name and type
+        col_name, col_type = map(str.strip, col.split(":"))
+
+        # Normalize INTEGER type: remove length if specified
+        if col_type.upper().startswith("INTEGER"):
+            col_type = "INTEGER"
+
+        # Reconstruct the normalized column definition
+        normalized_columns.append(f"{col_name} {col_type}")
+
+    # Handle constraints
+    if constraint and "PK" in constraint:
+        constraint_col = constraint.split(":")[0].strip()
+        for i, col in enumerate(normalized_columns):
+            if col.startswith(constraint_col):
+                normalized_columns[i] += " PRIMARY KEY NOT NULL"
+
+    # Generate SQL
+    sql = f"CREATE TABLE {table_name} (\n    {',\n    '.join(normalized_columns)}\n);"
+    return sql, table_name
+
 def generate_create_table_sql(row):
     """Generate SQL for creating a table based on the row."""
     table_name = row['Table Name']
