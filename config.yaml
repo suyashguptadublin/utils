@@ -1,0 +1,14 @@
+excel:
+  file_path: "C:/Products/projects/python/database_operations/validations.xlsx"
+  sheet_name: "Validations"
+
+database:
+  host: "localhost"
+  port: 1025
+  user: "db_user"
+  password: "secret_password"
+  database_name: "example_db"
+
+logging:
+  level: "INFO"
+  log_file: "app.log"
