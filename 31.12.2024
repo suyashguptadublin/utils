@@ -1,0 +1,31 @@
+import hashlib
+import pandas as pd
+
+def generate_table_structure_hash_from_excel(row):
+    """
+    Generate a hash for a table's structure based on column definitions from the Excel row.
+    Ensures consistency by sorting columns alphabetically by name before concatenation.
+    Args:
+        row (dict): Row containing table details (Table Name, Column Name).
+    Returns:
+        str: SHA-256 hash of the sorted concatenated column structure.
+    """
+    # Parse column definitions from the Excel row
+    column_def = row['Column Name']
+
+    # Split columns and parse their properties
+    columns = column_def.split(",\n")  # Split by newlines
+    parsed_columns = []
+    for col in columns:
+        name, *properties = col.strip().split(":")  # Extract name and properties
+        parsed_columns.append((name.strip(), ":".join(properties).strip()))
+
+    # Sort columns alphabetically by name
+    sorted_columns = sorted(parsed_columns, key=lambda x: x[0].lower())
+
+    # Concatenate name-property pairs
+    structure_string = "".join(f"{col[0]}:{col[1]}" for col in sorted_columns)
+
+    # Generate and return SHA-256 hash
+    structure_hash = hashlib.sha256(structure_string.encode('utf-8')).hexdigest()
+    return structure_hash
