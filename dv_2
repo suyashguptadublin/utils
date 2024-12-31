@@ -1,6 +1,41 @@
 from openpyxl import load_workbook
 import hashlib
+def compute_signature_with_order(values, selection_order):
+    """
+    Compute a hash signature for values based on a specific selection order.
+    Args:
+        values (str): String of values in a structured format (e.g., JSON-like or list of lists).
+                      Example: "[[1, 'RED', '353XXXX'], [2, 'GREEN', '353XXXY']]"
+        selection_order (str): Comma-separated string specifying the selection order.
+                               Example: "ID,NAME,PHONE"
+    Returns:
+        str: SHA-256 hash representing the reordered values' signature.
+    """
+    try:
+        # Parse the values and selection order
+        parsed_values = eval(values)  # Converts string representation to Python list
+        selection_order = [col.strip() for col in selection_order.split(",")]
 
+        # Ensure values match the selection order
+        if len(parsed_values[0]) != len(selection_order):
+            raise ValueError("Number of columns in 'Values' does not match the 'Selection Order'.")
+
+        # Normalize data based on selection order
+        normalized_data = []
+        for row in parsed_values:
+            # Reorder row values based on the selection order
+            reordered_row = [str(row[selection_order.index(col)]) for col in selection_order]
+            normalized_data.append("|".join(reordered_row))  # Join reordered values with "|"
+
+        # Join all rows into a single string
+        data_string = "\n".join(normalized_data)
+
+        # Compute and return the hash
+        return hashlib.sha256(data_string.encode('utf-8')).hexdigest()
+
+    except Exception as e:
+        print(f"Error computing signature: {values}, {selection_order}. Exception: {e}")
+        return None
 def precompute_signatures_from_excel(file_path, sheet_name):
     """
     Compute and save hash signatures based on values in an Excel sheet.
