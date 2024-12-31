@@ -1,5 +1,40 @@
 from openpyxl import load_workbook
 import hashlib
+
+import hashlib
+
+def compute_table_structure_hash(column_def):
+    """
+    Compute a hash for table properties while handling cases where INTEGER is defined without length.
+    Args:
+        column_def (str): Column definitions as a string (e.g., "ID:INTEGER,\nNAME:VARCHAR,\nAGE:INTEGER").
+    Returns:
+        str: SHA-256 hash of the sorted and normalized column definitions.
+    """
+    # Parse and normalize column definitions
+    columns = column_def.split(",\n")  # Split by newlines
+    parsed_columns = []
+
+    for col in columns:
+        # Split the column definition into name and type
+        col_name, col_type = map(str.strip, col.split(":"))
+        
+        # Normalize the type: remove length for INTEGER
+        if col_type.upper().startswith("INTEGER"):
+            col_type = "INTEGER"  # Strip any length specification like INTEGER(10)
+        
+        # Reconstruct the normalized column definition
+        parsed_columns.append(f"{col_name}:{col_type}")
+
+    # Sort columns alphabetically by column name
+    sorted_columns = sorted(parsed_columns, key=lambda x: x.split(":")[0].lower())
+
+    # Concatenate sorted column definitions
+    structure_string = "".join(sorted_columns)
+
+    # Compute and return the hash
+    return hashlib.sha256(structure_string.encode('utf-8')).hexdigest()
+
 def compute_signature_with_order(values, selection_order):
     """
     Compute a hash signature for values based on a specific selection order.
