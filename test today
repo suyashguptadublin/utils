@@ -1,21 +1,49 @@
 def generate_table_record_sql(row):
-    table_name = row['Table Name']
-    column_def = row['Column Name']
-    orderby = row['Selection Order']
-    filter = row['Filter Condition']
+    """
+    Generate an SQL query to compute HASHROW for a table based on input row configuration.
+
+    Args:
+        row (dict): A dictionary containing keys:
+            - 'Table Name': The name of the table.
+            - 'Column Name': A comma-separated list of column names.
+            - 'Selection Order': A comma-separated list for ORDER BY.
+            - 'Filter Condition': Additional WHERE conditions (optional).
+
+    Returns:
+        str: A properly formatted SQL query string.
+    """
+    # Extract required values from the row
+    table_name = row.get('Table Name', '').strip()
+    column_def = row.get('Column Name', '').strip()
+    orderby = row.get('Selection Order', '').strip()
+    filter_condition = row.get('Filter Condition', '').strip()
 
     # Parse column names
-    if columns:
-        columns = column_def.split(",\n")  # Split by newlines
+    if column_def:
+        columns = column_def.split(",\n")  # Split by newlines or commas
         columns = [col.strip() for col in columns]  # Remove extra spaces
     else:
-        columns = '*'
+        raise ValueError("Column names must be specified for HASHROW computation.")
 
+    # Parse orderby columns
     if orderby:
-        orderby = orderby.split(",\n")
-        orderby = [col.strip() for col in orderby]
+        orderby_columns = orderby.split(",\n")  # Split by newlines or commas
+        orderby_columns = [col.strip() for col in orderby_columns]
     else:
-        orderby = columns
+        orderby_columns = columns  # Default to columns if no specific order provided
 
-    # Parse values (assuming JSON-like format)
-    f"SELECT HASHROW{columns} AS row_hash FROM {table_name} order by {orderby} HASHROW{columns};"
+    # Create the column and orderby lists as comma-separated strings
+    column_list = ", ".join(columns)
+    orderby_list = ", ".join(orderby_columns)
+
+    # Build the SQL query
+    sql_query = f"SELECT HASHROW({column_list}) AS row_hash FROM {table_name}"
+    
+    # Add filter condition if provided
+    if filter_condition:
+        sql_query += f" WHERE {filter_condition}"
+
+    # Add order by clause
+    sql_query += f" ORDER BY {orderby_list};"
+
+    return sql_query
