@@ -1,0 +1,21 @@
+def generate_table_record_sql(row):
+    table_name = row['Table Name']
+    column_def = row['Column Name']
+    orderby = row['Selection Order']
+    filter = row['Filter Condition']
+
+    # Parse column names
+    if columns:
+        columns = column_def.split(",\n")  # Split by newlines
+        columns = [col.strip() for col in columns]  # Remove extra spaces
+    else:
+        columns = '*'
+
+    if orderby:
+        orderby = orderby.split(",\n")
+        orderby = [col.strip() for col in orderby]
+    else:
+        orderby = columns
+
+    # Parse values (assuming JSON-like format)
+    f"SELECT HASHROW{columns} AS row_hash FROM {table_name} order by {orderby} HASHROW{columns};"
