@@ -1,0 +1,75 @@
+import pandas as pd
+
+class ExcelOperationFramework:
+    def __init__(self, excel_sheet_name, tab_name, operation_function):
+        """
+        Initialize the framework with an Excel file, tab name, and operation function.
+
+        Args:
+            excel_sheet_name (str): Path to the Excel file.
+            tab_name (str): Name of the tab (sheet) in the Excel file.
+            operation_function (callable): A function to execute for the operation.
+        """
+        self.excel_sheet_name = excel_sheet_name
+        self.tab_name = tab_name
+        self.operation_function = operation_function
+
+    def execute(self):
+        """
+        Execute the operation function on the specified Excel sheet and tab.
+        """
+        try:
+            # Load the Excel sheet
+            data = pd.read_excel(self.excel_sheet_name, sheet_name=self.tab_name)
+
+            # Execute the operation function
+            result = self.operation_function(data)
+
+            # Return the result
+            return result
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
+
+# Example operation functions
+def compute_sha256(data):
+    """Compute SHA-256 hash for each row."""
+    import hashlib
+
+    def hash_row(row):
+        row_data = "|".join(str(value) for value in row)
+        return hashlib.sha256(row_data.encode('utf-8')).hexdigest()
+
+    data['SHA-256'] = data.apply(hash_row, axis=1)
+    return data
+
+def count_rows(data):
+    """Count the number of rows in the sheet."""
+    return len(data)
+
+def summarize_columns(data):
+    """Summarize the columns by showing their names and types."""
+    return data.dtypes.to_dict()
+
+# Example usage
+if __name__ == "__main__":
+    # Define Excel file, sheet name, and operation
+    excel_file = "example.xlsx"
+    sheet_name = "Sheet1"
+
+    # Operation 1: Compute SHA-256
+    framework = ExcelOperationFramework(excel_file, sheet_name, compute_sha256)
+    result = framework.execute()
+    print("SHA-256 Computed Data:")
+    print(result)
+
+    # Operation 2: Count Rows
+    framework = ExcelOperationFramework(excel_file, sheet_name, count_rows)
+    result = framework.execute()
+    print(f"Row Count: {result}")
+
+    # Operation 3: Summarize Columns
+    framework = ExcelOperationFramework(excel_file, sheet_name, summarize_columns)
+    result = framework.execute()
+    print("Column Summary:")
+    print(result)
