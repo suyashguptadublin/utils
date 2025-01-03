@@ -1,0 +1,93 @@
+An example would be the way to generate the SHA for the CreatFN tab the following string would be used as the data to the function. Database Name “TestDB001” the table name “TestTable001” Column name “TestCol001” etc so the resultant string looks like the following.  “TeastDB001TestTable001TestCol001Integer32TestCol002Varchar(20)TestCol003Float64” if there were multiple tables then they are appended just the same as this  the order is important as the SHA is order sensitive. When the signature type is DataRule the attribute used is the Column Value not the type to generate the string So the example from the CheckRule001 would be  “TeastDB001TestTable001TestCol00167TestCol002Test String 1TestCol0033.14159265”
+
+Create Table Tab
+
+ObjectType	ObjectName	ObjectAttribute
+SignitureDefinition 	CreateTable	
+Database 	TestDB001	
+Table	TestTable001	
+Column	TestCol001	Integer32
+Column	TestCol002	Varchar(20)
+Column	TestCol003	Float64
+		
+Signiture_Checksum 	SHA_256	sldkfhaljdkjva;deil
+
+
+
+Check rule tab 
+
+ObjectType	ObjectName	ObjectAttribute
+SignitureDefinition 	RuleValidation	
+Database 	TestDB001	
+Table	TestTable001	
+Column	TestCol001	67
+Column	TestCol002	"Sample String"
+Column	TestCol003	3.14159265
+		
+Signiture_Checksum 	SHA_256	aksljnabjdvkn;alsjf
+
+
+
+ObjectType	ObjectName	ObjectAttribute		Note
+SignitureDefinition 	DataPopulation 			
+Database 	TestDB001			
+Table	TestTable001			
+Column	TestCol001	67		
+Column	TestCol002	"Sample String"		
+Column	TestCol003	3.14159265		
+				
+				
+				
+				
+				
+				
+Database 	TestDB0043			
+Table	TestTable0074			
+Column	TestCol001	67		
+Column	TestCol002	"Lost In Space "		
+Column	TestCol003	3.14159265		
+Column	TestCol004	"Danger Will Robinson, Danger"		
+				
+				
+Database	Test005 			
+Table	ChildTable			
+Column 	IndexedLinked	67		This may be a child record from TableTestTable001 in Database TestDB001 column TestCol001
+				
+				
+				
+				
+				
+				
+Signiture_Checksum 	SHA_256	aksljnabjlkascnflaksjvcls\dkvndvkn;alsjf		
+
+
+
+
+
+Sample Def Tab
+
+ObjectType	ObjectName	ObjectAttribute
+SignitureDefinition 	CreatTable	
+		
+Database	ObjectName	
+Table	ObjectName	
+Column	ObjectName	TRUE
+		
+		
+		
+		
+SignitureDefinition 	DataRule	
+Database	ObjectName	
+TableName	ObjectName	
+Column	ObjectName	TRUE
+		
+		
+		
+		
+		
+		
+SignitureDefinition 	DataPopulation	
+Database	ObjectName	
+TableName	ObjectName	
+Column	ObjectName	TRUE
+
