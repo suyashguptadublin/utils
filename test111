@@ -1,0 +1,35 @@
+def create_table(tab_data, sha_ref_tab=None):
+    """
+    Generate a CREATE TABLE statement based on the properties in the CreateTable tab.
+
+    Args:
+        tab_data (DataFrame): The data from the CreateTable tab.
+        sha_ref_tab (DataFrame): Not required for table creation but included for consistency.
+
+    Returns:
+        str: The generated CREATE TABLE SQL statement.
+    """
+    # Ensure the tab has the required structure
+    if 'ObjectType' not in tab_data.columns or 'ObjectName' not in tab_data.columns:
+        raise ValueError("The tab is missing required columns 'ObjectType' and 'ObjectName'.")
+
+    # Extract database and table names
+    database = tab_data.loc[tab_data['ObjectType'] == 'Database', 'ObjectName'].values[0]
+    table = tab_data.loc[tab_data['ObjectType'] == 'Table', 'ObjectName'].values[0]
+
+    # Extract column definitions
+    columns = tab_data[tab_data['ObjectType'] == 'Column']
+    if columns.empty:
+        raise ValueError("No columns defined in the tab.")
+
+    column_definitions = []
+    for _, row in columns.iterrows():
+        column_name = row['ObjectName']
+        column_type = row['ObjectAttribute']
+        column_definitions.append(f"{column_name} {column_type}")
+
+    # Construct the CREATE TABLE SQL statement
+    column_definitions_str = ",\n    ".join(column_definitions)
+    create_table_sql = f"CREATE TABLE {database}.{table} (\n    {column_definitions_str}\n);"
+
+    return create_table_sql
