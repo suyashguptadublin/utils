@@ -1,5 +1,33 @@
 
-
+rror: 'Database'
+Traceback (most recent call last):
+  File "C:\Products\projects\python\database_operations\excel_operations.py", line 47, in execute
+    result = function(data)
+  File "C:\Products\projects\python\database_operations\excel_operations.py", line 173, in create_table
+    sql_query, database = create_table_sql(tab_data)
+                          ~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Products\projects\python\database_operations\excel_operations.py", line 108, in create_table_sql
+    for (database, table), group in columns.groupby(['Database', 'Table']):
+                                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Products\projects\python\venv\Lib\site-packages\pandas\core\frame.py", line 9183, in groupby
+    return DataFrameGroupBy(
+        obj=self,
+    ...<7 lines>...
+        dropna=dropna,
+    )
+  File "C:\Products\projects\python\venv\Lib\site-packages\pandas\core\groupby\groupby.py", line 1329, in __init__
+    grouper, exclusions, obj = get_grouper(
+                               ~~~~~~~~~~~^
+        obj,
+        ^^^^
+    ...<5 lines>...
+        dropna=self.dropna,
+        ^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Products\projects\python\venv\Lib\site-packages\pandas\core\groupby\grouper.py", line 1043, in get_grouper
+    raise KeyError(gpr)
+KeyError: 'Database'
 def compute_signature_with_order(values, selection_order):
     """
     Compute a hash signature for values based on a specific selection order.
