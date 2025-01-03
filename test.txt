@@ -1,3 +1,16 @@
+Compute a SHA_256 from a list 
+I want to have a function that will generate a SHA_256 from a list , preserving the order of the items in the list so that the order will always provide a consistent SHA_256 if the items in the list are the same or different order. 
+The function will take a list of tuples consisting of the index key and the value.
+An example might be a Colum name and a value such as (TestCol001,46).
+This will allow the SHA_256 function generator to sort the list  based on the index identifier as the order and thus give consistent SHA_256 result for the list regardless of the order it is supplied in.
+
+Table creation exampleTuple(ColumName,ColumnAttribute)
+(TestCol001,Integer32)
+(TestCol002,Varchar(20))
+(TestCol003,Float64)
+
+
+
 import sys
 import pandas as pd
 import hashlib
