@@ -1,0 +1,43 @@
+def create_table_sql(tab_data, sha_ref_tab=None):
+    """
+    Generate CREATE TABLE statements for one or more tables in the CreateTable tab.
+
+    Args:
+        tab_data (DataFrame): The data from the CreateTable tab.
+        sha_ref_tab (DataFrame): Not required for table creation but included for consistency.
+
+    Returns:
+        list of str: A list of generated CREATE TABLE SQL statements.
+    """
+    # Ensure the tab has the required structure
+    if 'ObjectType' not in tab_data.columns or 'ObjectName' not in tab_data.columns:
+        raise ValueError("The tab is missing required columns 'ObjectType' and 'ObjectName'.")
+
+    # Group data by Database and Table
+    databases = tab_data[tab_data['ObjectType'] == 'Database']
+    tables = tab_data[tab_data['ObjectType'] == 'Table']
+    columns = tab_data[tab_data['ObjectType'] == 'Column']
+
+    if databases.empty or tables.empty or columns.empty:
+        raise ValueError("The tab must contain entries for 'Database', 'Table', and 'Column'.")
+
+    # Prepare SQL statements for each table
+    sql_statements = []
+
+    # Iterate over unique combinations of Database and Table
+    for (database, table), group in columns.groupby(['Database', 'Table']):
+        # Build the column definitions for this table
+        column_definitions = [
+            f"{row['ObjectName']} {row['ObjectAttribute']}"
+            for _, row in group.iterrows()
+        ]
+
+        if not column_definitions:
+            raise ValueError(f"No columns defined for table '{table}' in database '{database}'.")
+
+        # Construct the CREATE TABLE SQL statement
+        column_definitions_str = ",\n    ".join(column_definitions)
+        create_table_sql = f"CREATE TABLE {database}.{table} (\n    {column_definitions_str}\n);"
+        sql_statements.append(create_table_sql)
+
+    return sql_statements
