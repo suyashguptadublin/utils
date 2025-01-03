@@ -1,3 +1,5 @@
+
+['CREATE TABLE ddewd06s.TestTable078 (\n    TestCol001 Varchar(255),\n    TestCol002 Varchar(20),\n    TestCol003 Float\n);']
 def create_table_sql(tab_data, sha_ref_tab=None):
     """
     Generate CREATE TABLE statements for one or more tables in the CreateTable tab.
