@@ -1,0 +1,56 @@
+def create_table_sql(tab_data, sha_ref_tab=None):
+    """
+    Generate CREATE TABLE statements for one or more tables in the CreateTable tab.
+
+    Args:
+        tab_data (DataFrame): The data from the CreateTable tab.
+        sha_ref_tab (DataFrame): Not required for table creation but included for consistency.
+
+    Returns:
+        list of str: A list of generated CREATE TABLE SQL statements.
+    """
+    # Ensure the tab has the required structure
+    if 'ObjectType' not in tab_data.columns or 'ObjectName' not in tab_data.columns:
+        raise ValueError("The tab is missing required columns 'ObjectType' and 'ObjectName'.")
+
+    # Extract database and table names
+    tab_data['Database'] = None
+    tab_data['Table'] = None
+
+    # Fill 'Database' and 'Table' columns based on ObjectType
+    current_database = None
+    current_table = None
+
+    for idx, row in tab_data.iterrows():
+        if row['ObjectType'] == 'Database':
+            current_database = row['ObjectName']
+        elif row['ObjectType'] == 'Table':
+            current_table = row['ObjectName']
+        tab_data.loc[idx, 'Database'] = current_database
+        tab_data.loc[idx, 'Table'] = current_table
+
+    # Filter columns for SQL generation
+    columns = tab_data[tab_data['ObjectType'] == 'Column']
+
+    # Prepare SQL statements for each table
+    sql_statements = []
+
+    # Group by Database and Table
+    grouped = columns.groupby(['Database', 'Table'])
+
+    for (database, table), group in grouped:
+        # Build the column definitions for this table
+        column_definitions = [
+            f"{row['ObjectName']} {row['ObjectAttribute']}"
+            for _, row in group.iterrows()
+        ]
+
+        if not column_definitions:
+            raise ValueError(f"No columns defined for table '{table}' in database '{database}'.")
+
+        # Construct the CREATE TABLE SQL statement
+        column_definitions_str = ",\n    ".join(column_definitions)
+        create_table_sql = f"CREATE TABLE {database}.{table} (\n    {column_definitions_str}\n);"
+        sql_statements.append(create_table_sql)
+
+    return sql_statements
