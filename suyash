@@ -1,3 +1,4 @@
+Generate a signature from a spreadsheet tab and update the tab with the value. I want to pass in a tab such as the CreatFN or the CheckRule001 tab and the function will generate a row at the end with the required SHA_256 value and insert it into the sheet.  This would mean that the function has to determine what kind of SHA_256 rules to engage in to generate the list of columns to build the sha signature , example would be that the create table would have a different list of object types included in the building out of the SHA than the data validation sha would have, EG CreatFN sha uses the object attribute what is the column type in the database as part of the signature and the rule check would use the column value instead. These lists are in the SHA_refAttrib tab in the sheet attached.
 
 SignitureDefinition	CreateTable			Specifies rules for calculating SHA for table creation.
 Database	ObjectName	TRUE	Use the database name in the signature calculation.
