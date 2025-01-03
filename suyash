@@ -1,3 +1,21 @@
+
+SignitureDefinition	CreateTable			Specifies rules for calculating SHA for table creation.
+Database	ObjectName	TRUE	Use the database name in the signature calculation.
+Table	ObjectName	TRUE	Use the table name in the signature calculation.
+Column	ObjectName	TRUE	Use the column names in the signature calculation.
+Column	ObjectAttribute	TRUE	Use the column data types in the signature calculation.
+SignitureDefinition	RuleValidation			Specifies rules for calculating SHA for rule validation.
+Database	ObjectName	TRUE	Use the database name in the signature calculation.
+Table	ObjectName	TRUE	Use the table name in the signature calculation.
+Column	ObjectName	TRUE	Use the column names in the signature calculation.
+Column	Column Value	TRUE	Use the column values in the signature calculation (not the data types).
+SignitureDefinition	DataPopulation			Specifies rules for calculating SHA for data population.
+Database	ObjectName	TRUE	Use the database name in the signature calculation.
+Table	ObjectName	TRUE	Use the table name in the signature calculation.
+Column	ObjectName	TRUE	Use the column names in the signature calculation.
+Column	Column Value	TRUE	Use the column values in the signature calculation.
+
+
 An example would be the way to generate the SHA for the CreatFN tab the following string would be used as the data to the function. Database Name “TestDB001” the table name “TestTable001” Column name “TestCol001” etc so the resultant string looks like the following.  “TeastDB001TestTable001TestCol001Integer32TestCol002Varchar(20)TestCol003Float64” if there were multiple tables then they are appended just the same as this  the order is important as the SHA is order sensitive. When the signature type is DataRule the attribute used is the Column Value not the type to generate the string So the example from the CheckRule001 would be  “TeastDB001TestTable001TestCol00167TestCol002Test String 1TestCol0033.14159265”
 
 Create Table Tab
