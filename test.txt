@@ -9,7 +9,44 @@ Table creation exampleTuple(ColumName,ColumnAttribute)
 (TestCol002,Varchar(20))
 (TestCol003,Float64)
 
+import hashlib
 
+def compute_sha256_from_list(input_list):
+    """
+    Compute a consistent SHA-256 hash from a list of tuples.
+    
+    Args:
+        input_list (list of tuple): A list of tuples where each tuple consists of
+                                    an index (key) and a value.
+                                    Example: [(TestCol001, 46), (TestCol002, 20)]
+    
+    Returns:
+        str: A SHA-256 hash string.
+    """
+    # Step 1: Sort the list of tuples by the key (first item in each tuple)
+    sorted_list = sorted(input_list, key=lambda x: x[0])
+    
+    # Step 2: Convert the sorted list into a string representation
+    # Ensure consistent string format for hashing
+    concatenated_string = "|".join(f"{key}:{value}" for key, value in sorted_list)
+    
+    # Step 3: Compute the SHA-256 hash
+    sha256_hash = hashlib.sha256(concatenated_string.encode('utf-8')).hexdigest()
+    
+    return sha256_hash
+
+# Example Usage
+if __name__ == "__main__":
+    # Define a list of tuples (key, value)
+    input_list = [
+        ("TestCol001", "Integer32"),
+        ("TestCol003", "Float64"),
+        ("TestCol002", "Varchar(20)")
+    ]
+
+    # Compute SHA-256 hash
+    result_hash = compute_sha256_from_list(input_list)
+    print("SHA-256 Hash:", result_hash)
 
 import sys
 import pandas as pd
